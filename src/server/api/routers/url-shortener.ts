@@ -8,14 +8,6 @@ import {
 } from "~/server/api/trpc";
 
 export const urlShortenerRouter = createTRPCRouter({
-  hello: publicProcedure
-    .input(z.object({ text: z.string() }))
-    .query(({ input }) => {
-      return {
-        greeting: `Hello ${input.text}`,
-      };
-    }),
-
   getFullUrlAndIncrementCount: publicProcedure
     .input(z.object({ shortUrl: z.string().min(1).max(5) }))
     .query(async ({ ctx, input }) => {
@@ -35,6 +27,7 @@ export const urlShortenerRouter = createTRPCRouter({
           counts: {
             increment: 1,
           },
+          updatedAt: new Date(),
         },
         where: {
           shortUrl: input.shortUrl,
@@ -59,6 +52,36 @@ export const urlShortenerRouter = createTRPCRouter({
           fullUrl: input.fullUrl,
         },
       });
+    }),
+
+  getInfiniteData: publicProcedure
+    .input(
+      z.object({
+        limit: z.number().min(1).max(100),
+        cursor: z.string().nullish(),
+      }),
+    )
+    .query(async ({ input: { limit = 10, cursor }, ctx }) => {
+      const items = await ctx.db.urlShortener.findMany({
+        take: limit + 1,
+        cursor: cursor ? { shortUrl: cursor } : undefined,
+        orderBy: {
+          updatedAt: "desc",
+        },
+      });
+
+      let nextCursor: typeof cursor | undefined = undefined;
+      if (items.length > limit) {
+        const nextItem = items.pop();
+        nextCursor = nextItem!.shortUrl;
+      }
+
+      // Print log for debugging purpose
+      console.log(items);
+      return {
+        items,
+        nextCursor,
+      };
     }),
 
   // getLatest: protectedProcedure.query(({ ctx }) => {

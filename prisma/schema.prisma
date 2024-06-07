@@ -19,6 +19,7 @@ model UrlShortener {
     fullUrl   String   @unique
     counts    Int      @default(0)
     createdAt DateTime @default(now())
+    updatedAt DateTime @default(now())
     // createdBy String
     // user      User     @relation(fields: [createdBy], references: [id])
 

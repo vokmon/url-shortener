@@ -5,22 +5,24 @@
 // import { getServerAuthSession } from "~/server/auth";
 // import { api } from "~/trpc/server";
 import UrlInputForm from "./_components/UrlInputForm";
+import UrlTable from "./_components/UrlTable";
 
 export const metadata = {
-  title: 'Url Shortener'
-}
+  title: "Url Shortener",
+};
 
 export default async function Home() {
   // const hello = await api.urlShortener.hello({ text: "from tRPC" });
   // const session = await getServerAuthSession();
 
-
   return (
     <main className="flex min-h-screen flex-col items-center ">
       <h1 className="py-10 text-3xl">URL Shrinker</h1>
 
-      <UrlInputForm />
-
+      <div className="max-w-screen-sm flex w-full flex-col gap-5">
+        <UrlInputForm />
+        <UrlTable />
+      </div>
       {/* <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
         <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
           Create <span className="text-[hsl(280,100%,70%)]">T3</span> App

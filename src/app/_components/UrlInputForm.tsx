@@ -1,6 +1,9 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import {
+  Snippet,
+} from "@nextui-org/react";
 import { api } from "~/trpc/react";
 
 export default function UrlInputForm() {
@@ -39,8 +42,8 @@ export default function UrlInputForm() {
   }
 
   return (
-    <div className="flex w-full max-w-screen-sm flex-col items-center justify-center gap-3 px-5">
-      <form onSubmit={handleSubmit} className="flex w-full gap-2 px-5">
+    <div className="flex w-full flex-col items-center justify-center gap-3">
+      <form onSubmit={handleSubmit} className="flex w-full gap-2">
         <label htmlFor="fullUrl" className="sr-only">
           Url
         </label>
@@ -59,6 +62,7 @@ export default function UrlInputForm() {
         <button
           className="rounded-full bg-blue-500 px-5 py-2 text-white transition-colors duration-200 hover:bg-blue-400 focus-visible:bg-blue-400 disabled:cursor-not-allowed disabled:opacity-50"
           type="submit"
+          disabled={mutaion.isPending}
         >
           Shrink
         </button>
@@ -74,13 +78,18 @@ export default function UrlInputForm() {
       {Boolean(result.shortUrl) && Boolean(result.fullUrl) && (
         <div className="mt-3">
           Short url is{" "}
-          <a
-            className="font-medium text-blue-600 hover:underline dark:text-blue-500"
-            href={`/${result.shortUrl}`}
-            target="_blank"
+          <Snippet
+            symbol=""
+            codeString={`${window.location.href}${result.shortUrl}`}
           >
-            /{result.shortUrl}
-          </a>
+            <a
+              className="font-medium text-blue-600 hover:underline dark:text-blue-500"
+              href={`/${result.shortUrl}`}
+              target="_blank"
+            >
+              /{result.shortUrl}
+            </a>
+          </Snippet>
         </div>
       )}
     </div>
