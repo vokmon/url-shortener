@@ -8,47 +8,54 @@ import {
   TableCell,
   Spinner,
   Snippet,
+  Pagination,
 } from "@nextui-org/react";
 import QRCode from "react-qr-code";
-import { useInfiniteScroll } from "@nextui-org/use-infinite-scroll";
 import { type UrlShortener } from "@prisma/client";
 import { api } from "~/trpc/react";
+import { useMemo, useState } from "react";
 
-const rowsPerPage = 8;
+const rowsPerPage = 10;
 
 export default function UrlTable() {
-  const myQuery = api.urlShortener.getInfiniteData.useInfiniteQuery(
-    { limit: rowsPerPage },
-    { getNextPageParam: (lastPage) => lastPage.nextCursor },
-  );
+  const [page, setPage] = useState(1);
 
-  const [loaderRef, scrollerRef] = useInfiniteScroll({
-    hasMore: myQuery.hasNextPage,
-    onLoadMore: myQuery.fetchNextPage,
+  const myQuery = api.urlShortener.getPagingData.useQuery({
+    limit: rowsPerPage,
+    page,
   });
+
+  const pages = useMemo(() => {
+    return myQuery.data?.itemCounts
+      ? Math.ceil(myQuery.data?.itemCounts / rowsPerPage)
+      : 0;
+  }, [myQuery.data?.itemCounts, rowsPerPage]);
 
   if (myQuery.isLoading) {
     return <div>Loading...</div>;
   }
 
-  const itemData = myQuery.data?.pages.flatMap((page) => page.items);
+  const itemData = myQuery.data?.items;
 
   return (
     <Table
       aria-label="List of urls"
       isHeaderSticky
-      baseRef={scrollerRef}
       bottomContent={
-        myQuery.hasNextPage ? (
+        pages > 0 ? (
           <div className="flex w-full justify-center">
-            <Spinner ref={loaderRef} color="white" />
+            <Pagination
+              isCompact
+              showControls
+              showShadow
+              color="primary"
+              page={page}
+              total={pages}
+              onChange={(page: number) => setPage(page)}
+            />
           </div>
         ) : null
       }
-      classNames={{
-        base: "max-h-[520px] overflow-scroll",
-        table: "min-h-[400px]",
-      }}
     >
       <TableHeader>
         <TableColumn key="fullUrl">Full Url</TableColumn>

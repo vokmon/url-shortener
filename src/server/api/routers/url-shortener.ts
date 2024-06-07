@@ -54,33 +54,31 @@ export const urlShortenerRouter = createTRPCRouter({
       });
     }),
 
-  getInfiniteData: publicProcedure
+  getPagingData: publicProcedure
     .input(
       z.object({
         limit: z.number().min(1).max(100),
+        page: z.number().min(0),
         cursor: z.string().nullish(),
       }),
     )
-    .query(async ({ input: { limit = 10, cursor }, ctx }) => {
-      const items = await ctx.db.urlShortener.findMany({
-        take: limit + 1,
-        cursor: cursor ? { shortUrl: cursor } : undefined,
-        orderBy: {
-          updatedAt: "desc",
-        },
-      });
-
-      let nextCursor: typeof cursor | undefined = undefined;
-      if (items.length > limit) {
-        const nextItem = items.pop();
-        nextCursor = nextItem!.shortUrl;
-      }
+    .query(async ({ input: { limit = 10, page = 0 }, ctx }) => {
+      const [items, itemCounts] = await ctx.db.$transaction([
+        ctx.db.urlShortener.findMany({
+          take: limit,
+          skip: (page - 1) * limit,
+          orderBy: {
+            updatedAt: "desc",
+          },
+        }),
+        ctx.db.urlShortener.count(),
+      ]);
 
       // Print log for debugging purpose
       console.log(items);
       return {
         items,
-        nextCursor,
+        itemCounts,
       };
     }),
 

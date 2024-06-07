@@ -2,10 +2,11 @@
 // import { FormEvent } from "react";
 
 // import { CreatePost } from "~/app/_components/create-post";
-// import { getServerAuthSession } from "~/server/auth";
+import { getServerAuthSession } from "~/server/auth";
 // import { api } from "~/trpc/server";
 import UrlInputForm from "./_components/UrlInputForm";
 import UrlTable from "./_components/UrlTable";
+import Link from "next/link";
 
 export const metadata = {
   title: "Url Shortener",
@@ -13,14 +14,31 @@ export const metadata = {
 
 export default async function Home() {
   // const hello = await api.urlShortener.hello({ text: "from tRPC" });
-  // const session = await getServerAuthSession();
+  const session = await getServerAuthSession();
 
   return (
     <main className="flex min-h-screen flex-col items-center ">
+      {session && (
+        <Link
+          href={"/api/auth/signout"}
+          className="w-52 rounded-lg absolute right-2 top-2 px-5 py-2.5 text-sm font-medium text-white bg-slate-800 hover:bg-slate-700 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+        >
+          Sign out
+        </Link>
+      )}
       <h1 className="py-10 text-3xl">URL Shrinker</h1>
+      <div className="flex w-full max-w-screen-sm flex-col items-center gap-5">
+        {session ? (
+          <UrlInputForm />
+        ) : (
+          <Link
+            href={"/api/auth/signin"}
+            className=" w-52 rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          >
+            Sign in and get your link
+          </Link>
+        )}
 
-      <div className="max-w-screen-sm flex w-full flex-col gap-5">
-        <UrlInputForm />
         <UrlTable />
       </div>
       {/* <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
