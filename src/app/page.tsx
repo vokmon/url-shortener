@@ -21,7 +21,7 @@ export default async function Home() {
       {session && (
         <Link
           href={"/api/auth/signout"}
-          className="w-52 rounded-lg absolute right-2 top-2 px-5 py-2.5 text-sm font-medium text-white bg-slate-800 hover:bg-slate-700 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          className="w-30 rounded-lg absolute right-2 top-2 px-5 py-2.5 text-sm font-medium text-white bg-slate-800 hover:bg-slate-700 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
         >
           Sign out
         </Link>
