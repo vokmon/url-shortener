@@ -73,7 +73,7 @@ export default function UrlTable() {
             <TableCell>
               <a
                 className="font-medium text-blue-600 hover:underline dark:text-blue-500"
-                href={`/${item.fullUrl}`}
+                href={`${item.fullUrl}`}
                 target="_blank"
               >
                 {item.fullUrl}
