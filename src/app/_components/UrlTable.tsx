@@ -13,27 +13,37 @@ import {
 import QRCode from "react-qr-code";
 import { type UrlShortener } from "@prisma/client";
 import { api } from "~/trpc/react";
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
+// import { useSession } from "next-auth/react"
 
 const rowsPerPage = 10;
 
+const getUrl = (item: UrlShortener) => {
+  if (typeof window === "undefined") {
+    return "";
+  }
+  return `${window.location.href}${item.shortUrl}`;
+};
+
 export default function UrlTable() {
+  // const { data: session, status } = useSession()
+  // console.log(session, status);
+
   const [page, setPage] = useState(1);
 
-  const myQuery = api.urlShortener.getPagingData.useQuery({
-    limit: rowsPerPage,
-    page,
-  });
+  const myQuery = api.urlShortener.getPagingData.useQuery(
+    {
+      limit: rowsPerPage,
+      page,
+    },
+    { suspense: true },
+  );
 
   const pages = useMemo(() => {
     return myQuery.data?.itemCounts
       ? Math.ceil(myQuery.data?.itemCounts / rowsPerPage)
       : 0;
   }, [myQuery.data?.itemCounts, rowsPerPage]);
-
-  if (myQuery.isLoading) {
-    return <div>Loading...</div>;
-  }
 
   const itemData = myQuery.data?.items;
 
@@ -60,7 +70,7 @@ export default function UrlTable() {
       <TableHeader>
         <TableColumn key="fullUrl">Full Url</TableColumn>
         <TableColumn key="shortUrl">Short Url</TableColumn>
-        <TableColumn key="shortUrl">Url (Qr Code)</TableColumn>
+        <TableColumn key="qrCode">Url (Qr Code)</TableColumn>
         <TableColumn key="counts">Counts</TableColumn>
       </TableHeader>
       <TableBody
@@ -80,10 +90,7 @@ export default function UrlTable() {
               </a>
             </TableCell>
             <TableCell>
-              <Snippet
-                symbol=""
-                codeString={`${window.location.href}${item.shortUrl}`}
-              >
+              <Snippet symbol="" codeString={getUrl(item)}>
                 <a
                   className="font-medium text-blue-600 hover:underline dark:text-blue-500"
                   href={`/${item.shortUrl}`}
@@ -94,10 +101,7 @@ export default function UrlTable() {
               </Snippet>
             </TableCell>
             <TableCell align="center">
-              <QRCode
-                size={80}
-                value={`${window.location.href}${item.shortUrl}`}
-              />
+              <QRCode size={80} value={getUrl(item)} />
             </TableCell>
             <TableCell>{item.counts}</TableCell>
           </TableRow>

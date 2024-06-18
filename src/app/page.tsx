@@ -7,6 +7,8 @@ import { getServerAuthSession } from "~/server/auth";
 import UrlInputForm from "./_components/UrlInputForm";
 import UrlTable from "./_components/UrlTable";
 import Link from "next/link";
+import { NextAuthProvider } from "./_components/AuthProvider";
+import { Suspense } from "react";
 
 export const metadata = {
   title: "Url Shortener",
@@ -17,6 +19,7 @@ export default async function Home() {
   const session = await getServerAuthSession();
 
   return (
+    <NextAuthProvider>
     <main className="flex min-h-screen flex-col items-center ">
       {session && (
         <Link
@@ -39,7 +42,9 @@ export default async function Home() {
           </Link>
         )}
 
-        <UrlTable />
+        <Suspense fallback={<div>Loading table</div>}>
+          <UrlTable />
+        </Suspense>
       </div>
       {/* <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16 ">
         <h1 className="text-5xl font-extrabold tracking-tight sm:text-[5rem]">
@@ -89,5 +94,6 @@ export default async function Home() {
 
       </div> */}
     </main>
+    </NextAuthProvider>
   );
 }

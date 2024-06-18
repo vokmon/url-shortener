@@ -3,7 +3,7 @@ import { z } from "zod";
 
 import {
   createTRPCRouter,
-  // protectedProcedure,
+  protectedProcedure,
   publicProcedure,
 } from "~/server/api/trpc";
 
@@ -35,6 +35,12 @@ export const urlShortenerRouter = createTRPCRouter({
       });
     }),
 
+  createProtected: protectedProcedure
+  .input(z.object({ shortUrl: z.string().min(1).max(5) }))
+  .mutation(async({ctx, input}) => {
+    console.log(ctx, input);
+    return input;
+  }),
   create: publicProcedure
     .input(z.object({ fullUrl: z.string().min(1).url() }))
     .mutation(async ({ ctx, input }) => {
@@ -63,6 +69,7 @@ export const urlShortenerRouter = createTRPCRouter({
       }),
     )
     .query(async ({ input: { limit = 10, page = 0 }, ctx }) => {
+      await delay();
       const [items, itemCounts] = await ctx.db.$transaction([
         ctx.db.urlShortener.findMany({
           take: limit,
@@ -93,3 +100,9 @@ export const urlShortenerRouter = createTRPCRouter({
   //   return "you can now see this secret message!";
   // }),
 });
+
+const delay = async () => (
+  new Promise((resolve) => {
+    setTimeout(() => {resolve(true)}, 1000)
+  })
+);
