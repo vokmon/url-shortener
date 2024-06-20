@@ -13,7 +13,7 @@ import {
 import QRCode from "react-qr-code";
 import { type UrlShortener } from "@prisma/client";
 import { api } from "~/trpc/react";
-import { Suspense, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 // import { useSession } from "next-auth/react"
 
 const rowsPerPage = 10;

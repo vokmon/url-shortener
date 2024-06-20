@@ -17,28 +17,27 @@ export default function UrlInputForm() {
     isError: false,
     message: "",
   });
-  const mutaion = api.urlShortener.create.useMutation({
-    onSuccess: (data) => {
-      console.log(data);
-      setTextValue("");
-      setResult({
-        isError: false,
-        message: `The url ${textValue} is successfully added.`,
-        shortUrl: data.shortUrl,
-        fullUrl: data.fullUrl,
-      });
-    },
-    onError: (e) => {
+  
+  const mutaion = api.urlShortener.create.useMutation();
+  async function handleSubmit(e: FormEvent) {
+    try {
+      e.preventDefault();
+      const data = await mutaion.mutateAsync({ fullUrl: textValue });
+        setTextValue("");
+        setResult({
+          isError: false,
+          message: `The url ${textValue} is successfully added.`,
+          shortUrl: data.shortUrl,
+          fullUrl: data.fullUrl,
+        });
+    } catch(e) {
       console.error(e);
       setResult({
         isError: true,
         message: `Failed to shorten the url ${textValue}.`,
       });
-    },
-  });
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    await mutaion.mutateAsync({ fullUrl: textValue });
+    }
+    
   }
 
   return (
@@ -53,6 +52,7 @@ export default function UrlInputForm() {
           type="url"
           name="fullUrl"
           id="fullUrl"
+          data-testid="url-input"
           value={textValue}
           onChange={(e) => {
             setTextValue(e.target.value);
@@ -63,6 +63,7 @@ export default function UrlInputForm() {
           className="rounded-full bg-blue-500 px-5 py-2 text-white transition-colors duration-200 hover:bg-blue-400 focus-visible:bg-blue-400 disabled:cursor-not-allowed disabled:opacity-50"
           type="submit"
           disabled={mutaion.isPending}
+          data-testid='submit-button'
         >
           Shrink
         </button>

@@ -4,11 +4,11 @@
 // import { CreatePost } from "~/app/_components/create-post";
 import { getServerAuthSession } from "~/server/auth";
 // import { api } from "~/trpc/server";
-import UrlInputForm from "./_components/UrlInputForm";
-import UrlTable from "./_components/UrlTable";
 import Link from "next/link";
-import { NextAuthProvider } from "./_components/AuthProvider";
+import { NextAuthProvider } from "./_components/providers/AuthProvider";
 import { Suspense } from "react";
+import UrlInputForm from "./_components/organisms/UrlInputForm";
+import UrlTable from "./_components/organisms/UrlTable";
 
 export const metadata = {
   title: "Url Shortener",
