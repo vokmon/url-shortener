@@ -9,6 +9,10 @@ export default defineConfig({
     exclude: [...configDefaults.exclude, "**/e2e/**"],
     environment: "jsdom",
     setupFiles: './test/client/setup.ts',
+    coverage: {
+      reportsDirectory: "./coverage/client",
+      include: ['**/app/**', '**/styles/**'], // Exclude server-side folders
+    },
   },
   resolve: {
     alias: {
